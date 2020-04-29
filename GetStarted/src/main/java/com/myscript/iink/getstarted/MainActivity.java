@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Configuration conf = engine.getConfiguration();
     String confDir = "zip://" + getPackageCodePath() + "!/assets/conf";
     conf.setStringArray("configuration-manager.search-path", new String[]{confDir});
+    conf.setBoolean("text.guides.enable", false);
+    conf.setBoolean("export.jiix.strokes", true);
+    conf.setBoolean("export.jiix.glyphs", true);
     String tempDir = getFilesDir().getPath() + File.separator + "tmp";
     conf.setString("content-package.temp-folder", tempDir);
 
@@ -295,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
           });
 
-          List<NotePointer> subList = new ArrayList<>(pointers.subList(0, pointers.size() / 18));
+          List<NotePointer> subList = new ArrayList<>(pointers.subList(0, pointers.size() / 12));
           this.splitPointer(subList);
 
           Log.e(TAG, "words: " + words.size() + ", subList.size: " + subList.size());
@@ -321,29 +324,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     int count = 0;
 
-    for (NotePointer pointer : pointers) {
-      count += 1;
-
-      double pre = prePointer == null ? 0 : prePointer.p;
-
-      if (pre <= 0 && pointer.p > 0) {
-//        Log.e(TAG, "111：x：" + pointer.x + ", viewScale：" + viewScale + "，result：" + pointer.x * viewScale);
-        editorView.getEditor().pointerDown((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
-      } else if (pre > 0 && pointer.p > 0) {
-//        Log.e(TAG, "222：x：" + pointer.x + ", viewScale：" + viewScale + "，result：" + pointer.x * viewScale);
-        editorView.getEditor().pointerMove((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
-      } else if (pre > 0 && pointer.p <= 0) {
-//        Log.e(TAG, "333：x：" + pointer.x + ", viewScale：" + viewScale + "，result：" + pointer.x * viewScale);
-        editorView.getEditor().pointerUp((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
-      }
-
-      prePointer = pointer;
-
-//      if (count == pointers.size() - 1) {
-//        Log.e(TAG, "*** >>> finish !!!!!");
-//      } else {
-//        Log.e(TAG, "*** >>> current count: " + count);
+//    for (NotePointer pointer : pointers) {
+//      count += 1;
+//
+//      double pre = prePointer == null ? 0 : prePointer.p;
+//
+//      if (pre <= 0 && pointer.p > 0) {
+////        Log.e(TAG, "111：x：" + pointer.x + ", viewScale：" + viewScale + "，result：" + pointer.x * viewScale);
+//        editorView.getEditor().pointerDown((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
+//      } else if (pre > 0 && pointer.p > 0) {
+////        Log.e(TAG, "222：x：" + pointer.x + ", viewScale：" + viewScale + "，result：" + pointer.x * viewScale);
+//        editorView.getEditor().pointerMove((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
+//      } else if (pre > 0 && pointer.p <= 0) {
+////        Log.e(TAG, "333：x：" + pointer.x + ", viewScale：" + viewScale + "，result：" + pointer.x * viewScale);
+//        editorView.getEditor().pointerUp((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
 //      }
+//
+//      prePointer = pointer;
+//
+////      if (count == pointers.size() - 1) {
+////        Log.e(TAG, "*** >>> finish !!!!!");
+////      } else {
+////        Log.e(TAG, "*** >>> current count: " + count);
+////      }
+//    }
+
+    int nbPointers = pointers.size();
+
+    for(int i=0;i<nbPointers;i++)
+    {
+      NotePointer pointer = pointers.get(i);
+      if(i==0)
+        editorView.getEditor().pointerDown((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
+      if (i==nbPointers-1)
+        editorView.getEditor().pointerUp((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
+      else
+      {
+        editorView.getEditor().pointerMove((float)pointer.x, (float)pointer.y, -1, (float)pointer.p, PointerType.PEN, 10);
+      }
     }
   }
 
